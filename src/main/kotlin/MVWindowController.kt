@@ -34,19 +34,32 @@ class MVWindowController {
 
     /**
      * キャプチャした画像から盤面を作成
+     * @param size 盤面の大きさ
      * @return 作成した盤面
      */
-    fun make55Board(): Board {
-        val result = Board(7, 7, getNumOfAllMines(mvWindow))
+    fun makeBoard(size: Int): Board {
+        // 枠外の+2を含めた盤面の作成
+        val result = Board(size + 2, size + 2, getNumOfAllMines(mvWindow))
 
         // 1マスの画像の大きさ
-        val gridImageWidth = mvWindow.boardImageSize.first / 5
+        val gridImageWidth = 50
 
-        // 画像を5x5に分割
-        for (i in 0..4) {
-            for (j in 0..4) {
+        val boardImage = when(size) {
+            5 -> mvWindow.board5Image
+            6 -> mvWindow.board6Image
+            7 -> mvWindow.board7Image
+            8 -> mvWindow.board8Image
+            else -> {
+                println("盤面は5~8にして下さい")
+                mvWindow.board5Image
+            }
+        }
+
+        // 画像をsizeに分割
+        for (i in 0 until size) {
+            for (j in 0 until size) {
                 val gridImage =
-                    mvWindow.boardImage.getSubimage(
+                    boardImage.getSubimage(
                         gridImageWidth * j,
                         gridImageWidth * i,
                         gridImageWidth,
@@ -74,10 +87,11 @@ class MVWindowController {
      * 引数のマス目を右または左クリックする
      * @param point クリックしたい座標(row, column)
      * @param isLeft 左クリックしたいならtrue、右ならfalse
+     * @param size 盤面のサイズ
      */
-    fun clickGridAt(point: Pair<Int, Int>, isLeft: Boolean) {
+    fun clickGridAt(point: Pair<Int, Int>, isLeft: Boolean, size: Int) {
         // クリックする座標を取得
-        val clickPoint = mvWindow.getGridPoint(point)
+        val clickPoint = mvWindow.getGridPoint(point, size)
         robot.mouseMove(clickPoint.first, clickPoint.second)
 
         // 左クリック
@@ -120,7 +134,7 @@ class MVWindowController {
      * 画像を.pngで保存
      */
     fun saveImage() {
-        val image = mvWindow.windowImage
+        val image = mvWindow.board8Image
         ImageIO.write(image, "png", File("image.png"))
     }
 
@@ -267,22 +281,76 @@ private class MVWindow {
     // 地雷総数画像のサイズ
     private val numOfAllMinesImageSize = Pair(45, 20)
 
-    // 盤面画像 --------
-    val boardImage: BufferedImage
+    // 盤面5画像 --------
+    val board5Image: BufferedImage
         get() {
             return windowImage.getSubimage(
-                lengthToBoardImage.first,
-                lengthToBoardImage.second,
-                boardImageSize.first,
-                boardImageSize.second
+                lengthToBoard5Image.first,
+                lengthToBoard5Image.second,
+                board5ImageSize.first,
+                board5ImageSize.second
             )
         }
 
-    // 盤面画像の始点座標(左上)までの長さ
-    private val lengthToBoardImage = Pair(395, 234)
+    // 盤面5画像の始点座標(左上)までの長さ
+    private val lengthToBoard5Image = Pair(395, 234)
 
-    // 盤面画像のサイズ
-    val boardImageSize = Pair(250, 250)
+    // 盤面5画像のサイズ
+    val board5ImageSize = Pair(250, 250)
+
+    // 盤面6画像 --------
+    val board6Image: BufferedImage
+        get() {
+            return windowImage.getSubimage(
+                lengthToBoard6Image.first,
+                lengthToBoard6Image.second,
+                board6ImageSize.first,
+                board6ImageSize.second
+            )
+        }
+
+    // 盤面6画像の始点座標(左上)までの長さ
+    private val lengthToBoard6Image = Pair(370, 209)
+
+    // 盤面6画像のサイズ
+    val board6ImageSize = Pair(300, 300)
+
+    // 盤面7画像 --------
+    val board7Image: BufferedImage
+        get() {
+            return windowImage.getSubimage(
+                lengthToBoard7Image.first,
+                lengthToBoard7Image.second,
+                board7ImageSize.first,
+                board7ImageSize.second
+            )
+        }
+
+    // 盤面7画像の始点座標(左上)までの長さ
+    private val lengthToBoard7Image = Pair(345, 184)
+
+    // 盤面7画像のサイズ
+    val board7ImageSize = Pair(350, 350)
+
+    // 盤面8画像 --------
+    val board8Image: BufferedImage
+        get() {
+            return windowImage.getSubimage(
+                lengthToBoard8Image.first,
+                lengthToBoard8Image.second,
+                board8ImageSize.first,
+                board8ImageSize.second
+            )
+        }
+
+    // 盤面8画像の始点座標(左上)までの長さ
+    private val lengthToBoard8Image = Pair(320, 159)
+
+    // 盤面8画像のサイズ
+    val board8ImageSize = Pair(400, 400)
+
+    // 1マスの画像のサイズ
+    val gridImageSize = 50
 
     // クリア問題数画像 --------
     val numOfClearImage: BufferedImage
@@ -338,16 +406,26 @@ private class MVWindow {
     /**
      * マス目の中心の座標を取得
      * @param point 調べたいマス目(row, column)
+     * @param size 盤面のサイズ
      * @return ウィンドウ上での座標(x, y)
      */
-    fun getGridPoint(point: Pair<Int, Int>): Pair<Int, Int> {
+    fun getGridPoint(point: Pair<Int, Int>, size: Int): Pair<Int, Int> {
+        val lengthToBoardImage = when(size) {
+            5 -> lengthToBoard5Image
+            6 -> lengthToBoard6Image
+            7 -> lengthToBoard7Image
+            8 -> lengthToBoard8Image
+            else -> {
+                println("盤面は5~8にして下さい")
+                lengthToBoard5Image
+            }
+        }
+
         // 盤面左上の座標
         val boardPoint = plusPoint(windowImagePoint, lengthToBoardImage)
 
-        val gridSize = boardImageSize.first / 5
-
-        val gridXPoint = boardPoint.first + gridSize * (point.second - 1) + gridSize / 2
-        val gridYPoint = boardPoint.second + gridSize * (point.first - 1) + gridSize / 2
+        val gridXPoint = boardPoint.first + gridImageSize * (point.second - 1) + gridImageSize / 2
+        val gridYPoint = boardPoint.second + gridImageSize * (point.first - 1) + gridImageSize / 2
 
         return Pair(gridXPoint, gridYPoint)
     }

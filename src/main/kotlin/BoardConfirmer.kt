@@ -96,11 +96,14 @@ class BoardConfirmer(private val beforeBoard: Board) {
 
     /**
      * 地雷の組み合わせを適用した、可能性のある盤面のSetを作成
+     *
+     * 計算過程を表示する
      * @param mineCombinationArraySet 地雷の有無を1列に並べた組み合わせSet
      * @return 地雷の全可能性の組み合わせを適用した盤面のSet
      */
     private fun generateCombinationBoardSet(mineCombinationArraySet: Set<BooleanArray>): Set<Board> {
         val result = HashSet<Board>()
+        println("計算開始(組み合わせ総数: ${mineCombinationArraySet.size})")
 
         mineCombinationArraySet.forEach { mineCombinationArray ->
             // 地雷の有無の組み合わせを適用した盤面
