@@ -4,29 +4,28 @@ import io.github.rigarenu.Grid.*
 
 /**
  * 盤面を表すクラス
- * @param row 盤面の行数(縦)、上下の枠外も含めているので+2して渡す
- * @param column 盤面の列数(横)、左右の枠外も含めているので+2して渡す
+ * @param size 盤面のサイズ、上下左右の枠外も含めているので+2して渡す
  * @param allMines 地雷総数
  */
-class Board(val row: Int, val column: Int, val allMines: Int) {
+class Board(val rule: Rule, val size: Int, val allMines: Int) {
     // 枠外を含めた[row][column]の盤面、初期値は全てEMPTY
-    val gridBoard = Array(row) {
-        Array(column) {
-            EMPTY
+    val gridBoard = Array(size) {
+        Array(size) {
+            Empty
         }
     }
 
     init {
         // 外周1マスを枠外にする
-        gridBoard[0] = Array(column) {
-            OUT
+        gridBoard[0] = Array(size) {
+            Out
         }
-        gridBoard[row - 1] = Array(column) {
-            OUT
+        gridBoard[size - 1] = Array(size) {
+            Out
         }
-        for (i in 1..row - 2) {
-            gridBoard[i][0] = OUT
-            gridBoard[i][column - 1] = OUT
+        for (i in 1..size - 2) {
+            gridBoard[i][0] = Out
+            gridBoard[i][size - 1] = Out
         }
     }
 
@@ -35,10 +34,10 @@ class Board(val row: Int, val column: Int, val allMines: Int) {
      * @return コピー
      */
     fun copy(): Board {
-        val result = Board(row, column, allMines)
+        val result = Board(rule, size, allMines)
 
-        for (i in 0 until row) {
-            for (j in 0 until column) {
+        for (i in 0 until size) {
+            for (j in 0 until size) {
                 result.gridBoard[i][j] = gridBoard[i][j]
             }
         }
@@ -50,14 +49,14 @@ class Board(val row: Int, val column: Int, val allMines: Int) {
      * 盤面をコンソールに表示
      */
     fun dispBoard() {
-        for (r in 1..row - 2) {
-            for (c in 1..column - 2) {
+        for (r in 1..size - 2) {
+            for (c in 1..size - 2) {
                 when (gridBoard[r][c]) {
-                    UNKNOWN -> print("x")
-                    EMPTY -> print("_")
-                    QUESTION -> print("?")
-                    FLAG -> print("F")
-                    OUT -> print("o")
+                    Unknown -> print("x")
+                    Empty -> print("_")
+                    Question -> print("?")
+                    Flag -> print("F")
+                    Out -> print("o")
                     else -> print(gridBoard[r][c].num)
                 }
                 print(" ")
@@ -68,7 +67,7 @@ class Board(val row: Int, val column: Int, val allMines: Int) {
 
     /**
      * point(row, column)にgridを入力
-     * @param point 入力したい座標
+     * @param point 入力したい座標(row, column)
      * @param grid 入力したいGrid
      */
     fun setGrid(point: Pair<Int, Int>, grid: Grid) {

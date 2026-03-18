@@ -4,7 +4,7 @@ package io.github.rigarenu
  * TODO
  *  マスの画像 7, 8
  *  ウィンドウサイズ変更時の対応
- *  他ルールへの対応
+ *  複数ルールへの対応
  */
 
 /**
@@ -13,7 +13,7 @@ package io.github.rigarenu
  * サイズ6以上だとOutOfMemoryErrorが発生する可能性あり
  */
 fun main() {
-    solve(4, 6)
+    solve(4)
 }
 
 /**
@@ -23,19 +23,19 @@ fun main() {
  * @param numOfClear 解きたいクリア数
  * @param size 盤面のサイズ
  */
-fun solve(numOfClear: Int, size: Int) {
+fun solve(numOfClear: Int) {
     for(i in 1..numOfClear) {
         println("$i 回目")
         val mvWindowController = MVWindowController()
-        val board = mvWindowController.makeBoard(size)
+        val board = mvWindowController.makeBoard()
         val confirmedGrid = BoardConfirmer(board).getConfirmedGrid()
         mvWindowController.doActiveWindow()
         confirmedGrid.forEach {
             // 数字ならクリック、地雷なら旗を立てる
-            if (it.second == Grid.QUESTION) {
-                mvWindowController.clickGridAt(it.first, true, size)
-            } else if (it.second == Grid.FLAG) {
-                mvWindowController.clickGridAt(it.first, false, size)
+            if (it.second == Grid.Question) {
+                mvWindowController.clickGridAt(it.first, true)
+            } else if (it.second == Grid.Flag) {
+                mvWindowController.clickGridAt(it.first, false)
             }
         }
         mvWindowController.clickNextLevelButton()

@@ -1,6 +1,6 @@
 package io.github.rigarenu
 
-import io.github.rigarenu.Grid.EMPTY
+import io.github.rigarenu.Grid.Empty
 
 /**
  * 引数の盤面を総当たりし、確定できるマスを特定するクラス
@@ -22,9 +22,9 @@ class BoardConfirmer(private val beforeBoard: Board) {
         val result = HashSet<Pair<Pair<Int, Int>, Grid>>()
 
         // 残り空白マス
-        val remainingEmpty = beforeBoard.getNumOfGrid(EMPTY)
+        val remainingEmpty = beforeBoard.getNumOfGrid(Empty)
         // 残り地雷数
-        val remainingMines = beforeBoard.allMines - beforeBoard.getNumOfGrid(Grid.FLAG)
+        val remainingMines = beforeBoard.allMines - beforeBoard.getNumOfGrid(Grid.Flag)
 
         // 地雷の有無を1列に並べた組み合わせ一覧
         // (残り空白マス C 残り地雷数)個の組み合わせになる
@@ -33,15 +33,15 @@ class BoardConfirmer(private val beforeBoard: Board) {
         val mineCombinationBoardSet = generateCombinationBoardSet(mineCombinationArraySet)
 
         // 全可能性候補で同じマスが確定マスになる
-        for (r in 1..beforeBoard.row - 1) {
-            for (c in 1..beforeBoard.column - 1) {
+        for (r in 1..beforeBoard.size - 1) {
+            for (c in 1..beforeBoard.size - 1) {
                 var allFlagFlag = true // 現在参照しているマスが全盤面でFlagかどうか
                 var allNumFlag = true // 現在参照しているマスが全盤面で数字かどうか
 
                 // 可能性のある盤面のSetすべてを走査
                 mineCombinationBoardSet.forEach {
                     // 地雷(Flag)かそうでないか(Num)の2択になる
-                    if (it.gridBoard[r][c] == Grid.FLAG) {
+                    if (it.gridBoard[r][c] == Grid.Flag) {
                         allNumFlag = false
                     } else {
                         allFlagFlag = false
@@ -49,11 +49,11 @@ class BoardConfirmer(private val beforeBoard: Board) {
                 }
 
                 // 現在参照しているマスが空欄で、地雷か数字のフラグを満たしていたら確定させる
-                if (beforeBoard.gridBoard[r][c] == EMPTY) {
+                if (beforeBoard.gridBoard[r][c] == Empty) {
                     if (allFlagFlag) {
-                        result.add(Pair(Pair(r, c), Grid.FLAG))
+                        result.add(Pair(Pair(r, c), Grid.Flag))
                     } else if (allNumFlag) {
-                        result.add(Pair(Pair(r, c), Grid.QUESTION))
+                        result.add(Pair(Pair(r, c), Grid.Question))
                     }
                 }
             }
@@ -109,13 +109,13 @@ class BoardConfirmer(private val beforeBoard: Board) {
             // 地雷の有無の組み合わせを適用した盤面
             val mineCombinationBoard = beforeBoard.copy()
             var index = 0
-            for (r in 1..beforeBoard.row - 1) {
-                for (c in 1..beforeBoard.column - 1) {
-                    if (mineCombinationBoard.gridBoard[r][c] == EMPTY) {
+            for (r in 1..beforeBoard.size - 1) {
+                for (c in 1..beforeBoard.size - 1) {
+                    if (mineCombinationBoard.gridBoard[r][c] == Empty) {
                         if (mineCombinationArray[index]) {
-                            mineCombinationBoard.setGrid(Pair(r, c), Grid.FLAG)
+                            mineCombinationBoard.setGrid(Pair(r, c), Grid.Flag)
                         } else {
-                            mineCombinationBoard.setGrid(Pair(r, c), Grid.QUESTION)
+                            mineCombinationBoard.setGrid(Pair(r, c), Grid.Question)
                         }
                         index++
                     }
@@ -137,8 +137,8 @@ class BoardConfirmer(private val beforeBoard: Board) {
      * @return 合法ならtrue
      */
     private fun checkBoard(board: Board): Boolean {
-        for (r in 1..board.row - 1) {
-            for (c in 1..board.column - 1) {
+        for (r in 1..board.size - 1) {
+            for (c in 1..board.size - 1) {
                 // 現在参照しているマスが数字なら検証する
                 if (board.gridBoard[r][c].num >= 0) {
                     if (!checkNum(board, Pair(r, c))) {
@@ -164,7 +164,7 @@ class BoardConfirmer(private val beforeBoard: Board) {
             for (j in point.second - 1..point.second + 1) {
                 // 自身のマスは調べない
                 if (i == point.first && j == point.second) continue
-                if (board.gridBoard[i][j] == Grid.FLAG) {
+                if (board.gridBoard[i][j] == Grid.Flag) {
                     count++
                 }
             }

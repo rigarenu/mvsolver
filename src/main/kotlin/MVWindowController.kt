@@ -23,34 +23,43 @@ import kotlin.io.path.div
 private val robot = Robot()
 
 /**
- * 「Minesweeper Variants」のウィンドウの操作を行う
+ * 「Minesweeper Variants」のウィンドウの操作を行うクラス
+ *
  * 映っている数字の判別や、そこからの盤面の作成も行う
  */
 class MVWindowController {
+    // Minesweeper Variants のウィンドウ
     private val mvWindow = MVWindow()
 
     // OpenCVでの比較に使用する画像が入ったディレクトリのパス
     private val resourceImagesDirectoryPath = Path("src\\main\\resources")
 
+    init {
+        // OpenCV使用のためのネイティブライブラリのロード（既にロード済みならスキップされる）
+        OpenCV.loadLocally()
+    }
+
     /**
      * キャプチャした画像から盤面を作成
-     * @param size 盤面の大きさ
      * @return 作成した盤面
      */
-    fun makeBoard(size: Int): Board {
+    fun makeBoard(): Board {
+        val ruleAndSize = determineRuleAndSize()
+        val rule = ruleAndSize.first
+        val size = ruleAndSize.second
+
         // 枠外の+2を含めた盤面の作成
-        val result = Board(size + 2, size + 2, getNumOfAllMines(mvWindow))
+        val result = Board(rule, size + 2, getNumOfAllMines(mvWindow))
 
         // 1マスの画像の大きさ
         val gridImageWidth = 50
 
-        val boardImage = when(size) {
+        val boardImage = when (size) {
             5 -> mvWindow.board5Image
             6 -> mvWindow.board6Image
             7 -> mvWindow.board7Image
             8 -> mvWindow.board8Image
             else -> {
-                println("盤面は5~8にして下さい")
                 mvWindow.board5Image
             }
         }
@@ -87,9 +96,11 @@ class MVWindowController {
      * 引数のマス目を右または左クリックする
      * @param point クリックしたい座標(row, column)
      * @param isLeft 左クリックしたいならtrue、右ならfalse
-     * @param size 盤面のサイズ
      */
-    fun clickGridAt(point: Pair<Int, Int>, isLeft: Boolean, size: Int) {
+    fun clickGridAt(point: Pair<Int, Int>, isLeft: Boolean) {
+        // 盤面のサイズを取得
+        val size = determineRuleAndSize().second
+
         // クリックする座標を取得
         val clickPoint = mvWindow.getGridPoint(point, size)
         robot.mouseMove(clickPoint.first, clickPoint.second)
@@ -134,8 +145,42 @@ class MVWindowController {
      * 画像を.pngで保存
      */
     fun saveImage() {
-        val image = mvWindow.board8Image
+        val image = mvWindow.windowImage
         ImageIO.write(image, "png", File("image.png"))
+    }
+
+    /**
+     * 画像からルールと盤面のサイズを判定
+     * @return Pair<ルール, 盤面のサイズ>
+     */
+    private fun determineRuleAndSize(): Pair<Rule, Int> {
+        val image = mvWindow.windowImage.getSubimage(64, 572, 175, 22)
+
+        val tesseract = Tesseract()
+
+        // 学習データが入っているフォルダのパスを指定
+        tesseract.setDatapath("tessdata")
+
+        // 言語を指定
+        tesseract.setLanguage("eng")
+
+        val determinedStr = tesseract.doOCR(image).trim()
+
+        // ルールを初めて出た文字で判定、判定できなければVanillaにする
+        val firstChar = determinedStr.find {
+            it in 'A'..'Z'
+        }
+        val rule = Rule.entries.find {
+            it.char == firstChar
+        } ?: Rule.Vanilla
+
+        // 盤面のサイズを初めて出た数字で判定、判定できなければ5にする
+        val firstNum = determinedStr.find {
+            it in '5'..'8'
+        } ?: '5'
+        val size = firstNum.digitToInt()
+
+        return Pair(rule, size)
     }
 
     /**
@@ -168,7 +213,7 @@ class MVWindowController {
      * @param image 判別したいマスの画像
      */
     private fun determineGridWithOpenCV(image: BufferedImage): Grid {
-        var result = Grid.UNKNOWN
+        var result = Grid.Unknown
         val fileList = Files.list(resourceImagesDirectoryPath)
 
         fileList.forEach {
@@ -227,13 +272,11 @@ class MVWindowController {
  * 画面のキャプチャや切り抜きを行う
  */
 private class MVWindow {
-    init {
-        // OpenCV使用のためのネイティブライブラリのロード（既にロード済みならスキップされる）
-        OpenCV.loadLocally()
-    }
-
     // ウィンドウ名
     private val windowTitle = "Minesweeper Variants"
+
+    // 1マスの画像のサイズ
+    val gridImageSize = 50
 
     // ウィンドウ全体の画像 --------
     val windowImage: BufferedImage
@@ -264,7 +307,7 @@ private class MVWindow {
     // ウィンドウの始点座標(左上)
     var windowImagePoint = Pair(0, 0)
 
-    // 地雷総数画像 --------
+    // 地雷総数の画像 --------
     val numOfAllMinesImage: BufferedImage
         get() {
             return windowImage.getSubimage(
@@ -275,13 +318,13 @@ private class MVWindow {
             )
         }
 
-    // 地雷総数画像の始点座標(左上)までの長さ
+    // 地雷総数の画像の始点座標(左上)までの長さ
     private val lengthToNumOfAllMinesImage = Pair(145, 54)
 
-    // 地雷総数画像のサイズ
+    // 地雷総数の画像のサイズ
     private val numOfAllMinesImageSize = Pair(45, 20)
 
-    // 盤面5画像 --------
+    // 盤面5の画像 --------
     val board5Image: BufferedImage
         get() {
             return windowImage.getSubimage(
@@ -292,13 +335,13 @@ private class MVWindow {
             )
         }
 
-    // 盤面5画像の始点座標(左上)までの長さ
+    // 盤面5の画像の始点座標(左上)までの長さ
     private val lengthToBoard5Image = Pair(395, 234)
 
-    // 盤面5画像のサイズ
+    // 盤面5の画像のサイズ
     val board5ImageSize = Pair(250, 250)
 
-    // 盤面6画像 --------
+    // 盤面6の画像 --------
     val board6Image: BufferedImage
         get() {
             return windowImage.getSubimage(
@@ -309,13 +352,13 @@ private class MVWindow {
             )
         }
 
-    // 盤面6画像の始点座標(左上)までの長さ
+    // 盤面6の画像の始点座標(左上)までの長さ
     private val lengthToBoard6Image = Pair(370, 209)
 
-    // 盤面6画像のサイズ
+    // 盤面6の画像のサイズ
     val board6ImageSize = Pair(300, 300)
 
-    // 盤面7画像 --------
+    // 盤面7の画像 --------
     val board7Image: BufferedImage
         get() {
             return windowImage.getSubimage(
@@ -326,13 +369,13 @@ private class MVWindow {
             )
         }
 
-    // 盤面7画像の始点座標(左上)までの長さ
+    // 盤面7の画像の始点座標(左上)までの長さ
     private val lengthToBoard7Image = Pair(345, 184)
 
-    // 盤面7画像のサイズ
+    // 盤面7の画像のサイズ
     val board7ImageSize = Pair(350, 350)
 
-    // 盤面8画像 --------
+    // 盤面8の画像 --------
     val board8Image: BufferedImage
         get() {
             return windowImage.getSubimage(
@@ -343,16 +386,30 @@ private class MVWindow {
             )
         }
 
-    // 盤面8画像の始点座標(左上)までの長さ
+    // 盤面8の画像の始点座標(左上)までの長さ
     private val lengthToBoard8Image = Pair(320, 159)
 
-    // 盤面8画像のサイズ
+    // 盤面8の画像のサイズ
     val board8ImageSize = Pair(400, 400)
 
-    // 1マスの画像のサイズ
-    val gridImageSize = 50
+    // ルールと盤面のサイズの画像 --------
+    val ruleAndSizeImage: BufferedImage
+        get() {
+            return windowImage.getSubimage(
+                lengthToRuleAndSizeImage.first,
+                lengthToRuleAndSizeImage.second,
+                ruleAndSizeImageSize.first,
+                ruleAndSizeImageSize.second
+            )
+        }
 
-    // クリア問題数画像 --------
+    // ルールと盤面のサイズの画像の始点座標(左上)までの長さ
+    private val lengthToRuleAndSizeImage = Pair(64, 572)
+
+    // ルールと盤面のサイズの画像のサイズ
+    val ruleAndSizeImageSize = Pair(175, 22)
+
+    // クリア問題数の画像 --------
     val numOfClearImage: BufferedImage
         get() {
             return windowImage.getSubimage(
@@ -363,13 +420,13 @@ private class MVWindow {
             )
         }
 
-    // クリア問題数画像の始点座標(左上)までの長さ
+    // クリア問題数の画像の始点座標(左上)までの長さ
     private val lengthToNumOfClearImage = Pair(939, 573)
 
-    // クリア問題数画像のサイズ
+    // クリア問題数の画像のサイズ
     private val numOfClearImageSize = Pair(48, 18)
 
-    // ポップアップの右上の[x]ボタン --------
+    // ポップアップの右上の[x]ボタンの画像 --------
     val closeImage: BufferedImage
         get() {
             return windowImage.getSubimage(
@@ -383,10 +440,10 @@ private class MVWindow {
     // ポップアップの右上の[x]ボタンの画像の始点座標(左上)までの長さ
     private val lengthToCloseImage = Pair(905, 129)
 
-    // ポップアップの右上の[x]ボタン画像のサイズ
+    // ポップアップの右上の[x]ボタンの画像のサイズ
     private val closeImageSize = Pair(30, 34)
 
-    // ポップアップの「次のステージへ」ボタン --------
+    // ポップアップの「次のステージへ」ボタンの画像 --------
     val nextLevelImage: BufferedImage
         get() {
             return windowImage.getSubimage(
@@ -410,13 +467,15 @@ private class MVWindow {
      * @return ウィンドウ上での座標(x, y)
      */
     fun getGridPoint(point: Pair<Int, Int>, size: Int): Pair<Int, Int> {
-        val lengthToBoardImage = when(size) {
+        if (size !in 5..8) {
+            println("盤面は5 ~ 8のみです、盤面5として計算します。")
+        }
+        val lengthToBoardImage = when (size) {
             5 -> lengthToBoard5Image
             6 -> lengthToBoard6Image
             7 -> lengthToBoard7Image
             8 -> lengthToBoard8Image
             else -> {
-                println("盤面は5~8にして下さい")
                 lengthToBoard5Image
             }
         }
