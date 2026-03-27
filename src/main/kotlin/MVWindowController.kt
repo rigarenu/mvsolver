@@ -127,8 +127,9 @@ class MVWindowController {
 
     /**
      * 「次のステージへ」が表示されているか判定し、表示されていたらクリック
+     * @return クリックしたかどうか
      */
-    fun clickNextLevelButton() {
+    fun clickNextLevelButton(): Boolean {
         if (isSameImage(mvWindow.nextLevelImage, resourceImagesDirectoryPath / Path("next-level.png"))) {
             robot.mouseMove(
                 mvWindow.windowImagePoint.first + mvWindow.lengthToNextLeveImage.first + 8,
@@ -138,7 +139,11 @@ class MVWindowController {
             robot.delay(100)
             robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK)
             robot.delay(100)
+
+            return true
         }
+
+        return false
     }
 
     /**

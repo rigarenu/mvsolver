@@ -5,9 +5,9 @@ import io.github.rigarenu.Grid.*
 /**
  * 盤面を表すクラス
  * @param size 盤面のサイズ、上下左右の枠外も含めているので+2して渡す
- * @param allMines 地雷総数
+ * @param numOfAllMines 地雷総数
  */
-class Board(val rule: Rule, val size: Int, val allMines: Int) {
+class Board(val rule: Rule, val size: Int, val numOfAllMines: Int) {
     // 枠外を含めた[row][column]の盤面、初期値は全てEMPTY
     val gridBoard = Array(size) {
         Array(size) {
@@ -34,7 +34,7 @@ class Board(val rule: Rule, val size: Int, val allMines: Int) {
      * @return コピー
      */
     fun copy(): Board {
-        val result = Board(rule, size, allMines)
+        val result = Board(rule, size, numOfAllMines)
 
         for (i in 0 until size) {
             for (j in 0 until size) {
