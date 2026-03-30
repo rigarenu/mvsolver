@@ -43,3 +43,16 @@ bin/
 
 ### Mac OS ###
 .DS_Store
+/gradle.properties
+/gradlew
+/gradlew.bat
+/settings.gradle.kts
+/.idea/dictionaries/project.xml
+/.idea/gradle.xml
+/.idea/kotlinc.xml
+/.idea/misc.xml
+/.idea/vcs.xml
+/.idea/workspace.xml
+/gradle/wrapper/gradle-wrapper.jar
+/gradle/wrapper/gradle-wrapper.properties
+/src/test/kotlin/VanillaSolverTest.kt
