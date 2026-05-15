@@ -56,3 +56,6 @@ bin/
 /gradle/wrapper/gradle-wrapper.jar
 /gradle/wrapper/gradle-wrapper.properties
 /src/test/kotlin/VanillaSolverTest.kt
+/image.png
+/temp.png
+/src/test/kotlin/MainTest.kt

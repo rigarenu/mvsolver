@@ -48,8 +48,16 @@ class MVWindowController {
         val rule = ruleAndSize.first
         val size = ruleAndSize.second
 
+        val numOfAllMines = when(size) {
+            5 -> 10
+            6 -> 14
+            7 -> 20
+            8 -> 26
+            else -> 0
+        }
+
         // 枠外の+2を含めた盤面の作成
-        val result = Board(rule, size + 2, getNumOfAllMines(mvWindow))
+        val result = Board(rule, size + 2, numOfAllMines)
 
         // 1マスの画像の大きさ
         val gridImageWidth = 50
