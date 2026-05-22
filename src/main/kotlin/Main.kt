@@ -1,11 +1,12 @@
 package io.github.rigarenu
 
 /**
- * 日本語版、ルール「V:バニラ」のみに対応
+ * 日本語版のみに対応
  * ウィンドウが最前列かつ画面内に収まっている必要がある
  */
 fun main() {
-    solve(4)
+    val roundRobinSolver = RoundRobinSolver()
+    roundRobinSolver.solve(8)
 }
 
 /**
@@ -20,6 +21,7 @@ fun main() {
  * ③ 確定したマスをクリック
  * @param numOfLoop 解きたいクリア数
  */
+/*
 fun solve(numOfLoop: Int) {
     for(i in 1..numOfLoop) {
         println("$i ループ目")
@@ -45,3 +47,4 @@ fun solve(numOfLoop: Int) {
         mvWindowController.clickNextLevelButton()
     }
 }
+*/

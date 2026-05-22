@@ -57,6 +57,7 @@ class Board(val rule: Rule, val size: Int, val numOfAllMines: Int) {
                     Question -> print("?")
                     Flag -> print("F")
                     Out -> print("o")
+                    Exclamation -> print("!")
                     else -> print(gridBoard[r][c].num)
                 }
                 print(" ")

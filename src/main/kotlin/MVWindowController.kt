@@ -101,7 +101,7 @@ class MVWindowController {
     }
 
     /**
-     * 引数のマス目を右または左クリックする
+     * 引数のマス目を左または右クリックする
      * @param point クリックしたい座標(row, column)
      * @param isLeft 左クリックしたいならtrue、右ならfalse
      */
@@ -112,7 +112,28 @@ class MVWindowController {
         // クリックする座標を取得
         val clickPoint = mvWindow.getGridPoint(point, size)
         robot.mouseMove(clickPoint.first, clickPoint.second)
+        // 左クリック
+        var inputEvent = InputEvent.BUTTON1_DOWN_MASK
+        if (!isLeft) {
+            // 右クリック
+            inputEvent = InputEvent.BUTTON3_DOWN_MASK
+        }
 
+        robot.mousePress(inputEvent)
+        robot.delay(100)
+        robot.mouseRelease(inputEvent)
+        robot.delay(100)
+    }
+
+    /**
+     * 引数の座標を左または右クリックする
+     * @param point クリックしたい座標(x, y)
+     * @param isLeft 左クリックしたいならtrue、右ならfalse
+     */
+    fun clickPointAt(point: Pair<Int, Int>, isLeft: Boolean) {
+        val clickPoint = Pair(point.first + mvWindow.windowImagePoint.first, point.second + mvWindow.windowImagePoint.second)
+
+        robot.mouseMove(clickPoint.first, clickPoint.second)
         // 左クリック
         var inputEvent = InputEvent.BUTTON1_DOWN_MASK
         if (!isLeft) {
@@ -153,6 +174,29 @@ class MVWindowController {
 
         return false
     }
+
+    /**
+     * 「ヒント」が表示されているか判定し、表示されていたらクリック
+     * @return クリックしたかどうか
+     */
+    fun clickHintButton(): Boolean {
+        if (isSameImage(mvWindow.hintImage, resourceImagesDirectoryPath / Path("hint.png"))) {
+            robot.mouseMove(
+                mvWindow.windowImagePoint.first + mvWindow.lengthToHintImage.first + 8,
+                mvWindow.windowImagePoint.second + mvWindow.lengthToHintImage.second + 8
+            )
+            robot.mousePress(InputEvent.BUTTON1_DOWN_MASK)
+            robot.delay(100)
+            robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK)
+            robot.delay(100)
+
+            return true
+        }
+
+        return false
+    }
+
+
 
     /**
      * 画像を.pngで保存
@@ -267,7 +311,7 @@ class MVWindowController {
         resizedImage.release()
         resultMat.release()
 
-        return if (score > 0.95) true
+        return if (score > 0.97) true
         else false
     }
 
@@ -472,6 +516,23 @@ private class MVWindow {
 
     // ポップアップの「次のステージへ」ボタンの画像のサイズ
     private val nextLeveImageSize = Pair(150, 34)
+
+    // ポップアップの「ヒント」ボタンの画像 --------
+    val hintImage: BufferedImage
+        get() {
+            return windowImage.getSubimage(
+                lengthToHintImage.first,
+                lengthToHintImage.second,
+                hintImageSize.first,
+                hintImageSize.second
+            )
+        }
+
+    // ポップアップの「ヒント」ボタンの画像の始点座標(左上)までの長さ
+    val lengthToHintImage = Pair(500, 470)
+
+    // ポップアップの「ヒント」ボタンの画像のサイズ
+    val hintImageSize = Pair(128, 28)
 
     /**
      * マス目の中心の座標を取得

@@ -27,5 +27,8 @@ enum class Grid(val num: Int) {
     Flag(-4),
 
     // 枠外
-    Out(-5)
+    Out(-5),
+
+    // 枠外
+    Exclamation(-6)
 }
