@@ -6,7 +6,7 @@ package io.github.rigarenu
  */
 fun main() {
     val roundRobinSolver = RoundRobinSolver()
-    roundRobinSolver.solve(8)
+    roundRobinSolver.solve(4)
 }
 
 /**

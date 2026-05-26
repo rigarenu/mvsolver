@@ -116,12 +116,16 @@ class RoundRobinSolver {
     // 左と右を交互にクリックさせるフラグ
     private var leftRightFlag = true
 
+    // ハマるのを防ぐためのカウンタ
+    private var loopCounter = 0
+
     fun solve(numOfLoop: Int) {
         // アクティブウィンドウ化
         clickPointAt(windowImageStartPoint.first + 1, windowImageStartPoint.second + 1, true)
 
         for (i in 1..numOfLoop) {
             println("$i ループ目")
+            println(loopCounter)
             // 右上のリセットをクリック
             clickPointAt(windowImageStartPoint.first + 920, windowImageStartPoint.second + 70, true)
             // ステージを最初からやり直しますか？の「はい」をクリック
@@ -150,6 +154,14 @@ class RoundRobinSolver {
                 clickPointAt(windowImageStartPoint.first + 554, windowImageStartPoint.second + 484, true)
                 collectLinkedMap.clear()
                 hintGrid = Pair(0, 0)
+                loopCounter = 0
+            }
+
+            // たまにハマるのでリセットさせる
+            if(loopCounter++ > 100) {
+                collectLinkedMap.clear()
+                hintGrid = Pair(0, 0)
+                loopCounter = 0
             }
         }
     }
