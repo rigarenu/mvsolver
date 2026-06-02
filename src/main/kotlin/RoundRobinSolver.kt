@@ -125,7 +125,6 @@ class RoundRobinSolver {
 
         for (i in 1..numOfLoop) {
             println("$i ループ目")
-            println(loopCounter)
             // 右上のリセットをクリック
             clickPointAt(windowImageStartPoint.first + 920, windowImageStartPoint.second + 70, true)
             // ステージを最初からやり直しますか？の「はい」をクリック
