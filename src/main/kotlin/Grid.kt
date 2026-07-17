@@ -14,6 +14,7 @@ enum class Grid(val num: Int) {
     Seven(7),
     Eight(8),
     Nine(9),
+    Ten(10),
 
     // プログラムで確認できなかったマス目
     Unknown(-1),

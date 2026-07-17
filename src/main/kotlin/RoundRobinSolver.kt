@@ -226,7 +226,7 @@ class RoundRobinSolver {
         robot.mousePress(inputEvent)
         robot.delay(50)
         robot.mouseRelease(inputEvent)
-        robot.delay(size / 2 * 100) // 盤面が大きいほど待機も伸ばす
+        robot.delay(size / 2 * 150) // 盤面が大きいほど待機も伸ばす
     }
 
     /**
