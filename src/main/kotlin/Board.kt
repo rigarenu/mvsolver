@@ -5,9 +5,8 @@ import io.github.rigarenu.Grid.*
 /**
  * 盤面を表すクラス
  * @param size 盤面のサイズ、上下左右の枠外も含めているので+2して渡す
- * @param numOfAllMines 地雷総数
  */
-class Board(val rule: Rule, val size: Int, val numOfAllMines: Int) {
+class Board(val size: Int) {
     // 枠外を含めた[row][column]の盤面、初期値は全てEMPTY
     val gridBoard = Array(size) {
         Array(size) {
@@ -29,20 +28,8 @@ class Board(val rule: Rule, val size: Int, val numOfAllMines: Int) {
         }
     }
 
-    /**
-     * コピーを作成
-     * @return コピー
-     */
-    fun copy(): Board {
-        val result = Board(rule, size, numOfAllMines)
-
-        for (i in 0 until size) {
-            for (j in 0 until size) {
-                result.gridBoard[i][j] = gridBoard[i][j]
-            }
-        }
-
-        return result
+    override fun equals(other: Any?): Boolean {
+        return gridBoard.contentDeepEquals((other as Board).gridBoard)
     }
 
     /**
@@ -52,13 +39,10 @@ class Board(val rule: Rule, val size: Int, val numOfAllMines: Int) {
         for (r in 1..size - 2) {
             for (c in 1..size - 2) {
                 when (gridBoard[r][c]) {
-                    Unknown -> print("x")
                     Empty -> print("_")
-                    Question -> print("?")
+                    Num -> print("?")
                     Flag -> print("F")
-                    Out -> print("o")
-                    Exclamation -> print("!")
-                    else -> print(gridBoard[r][c].num)
+                    Out -> {}
                 }
                 print(" ")
             }
@@ -73,22 +57,5 @@ class Board(val rule: Rule, val size: Int, val numOfAllMines: Int) {
      */
     fun setGrid(point: Pair<Int, Int>, grid: Grid) {
         gridBoard[point.first][point.second] = grid
-    }
-
-    /**
-     * 盤面の引数のマスの数を取得
-     * @param grid 調べたいマスの種類
-     * @return マスの数
-     */
-    fun getNumOfGrid(grid: Grid): Int {
-        var result = 0
-        gridBoard.forEach { array ->
-            array.forEach {
-                if (it == grid) {
-                    result++
-                }
-            }
-        }
-        return result
     }
 }

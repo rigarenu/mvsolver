@@ -3,34 +3,9 @@ package io.github.rigarenu
 /**
  * マス目の状態を表す
  */
-enum class Grid(val num: Int) {
-    Zero(0),
-    One(1),
-    Two(2),
-    Three(3),
-    Four(4),
-    Five(5),
-    Six(6),
-    Seven(7),
-    Eight(8),
-    Nine(9),
-    Ten(10),
-
-    // プログラムで確認できなかったマス目
-    Unknown(-1),
-
-    // 空欄
-    Empty(-2),
-
-    // ?記号
-    Question(-3),
-
-    // 旗記号
-    Flag(-4),
-
-    // 枠外
-    Out(-5),
-
-    // 枠外
-    Exclamation(-6)
+enum class Grid {
+    Empty, // 空欄
+    Num, // 数字
+    Flag, // 旗記号
+    Out // 枠外
 }
