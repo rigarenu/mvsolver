@@ -29,7 +29,8 @@ class MVWindow {
     private val robot = Robot()
 
     // ウィンドウ全体における画像の始点座標
-    private var windowImagePoint = Pair(0, 0)
+    var windowImagePoint = Pair(0, 0)
+        private set
 
     // ウィンドウ全体の画像 --------
     private val windowImage: BufferedImage
@@ -153,9 +154,9 @@ class MVWindow {
     }
 
     /**
-     * ポップアップ上の「Hint」ボタンが表示されているなら押してtrueを返す。表示されていなければ何もせずfalseを返す
+     * ポップアップ上の「Hint」ボタンが表示されているならポップアップを閉じてtrueを返す。表示されていなければ何もせずfalseを返す
      *
-     * @return ポップアップ上の「Hint」ボタンが表示されているなら押してtrueを返す。表示されていなければ何もせずfalseを返す
+     * @return ポップアップ上の「Hint」ボタンが表示されているならポップアップを閉じてtrueを返す。表示されていなければ何もせずfalseを返す
      */
     fun clickHintButton(): Boolean {
         val hintImage = windowImage.getSubimage(
@@ -165,10 +166,9 @@ class MVWindow {
             PopupImageHeight.num
         )
         if (isSameImage(hintImage, Path("src\\main\\resources\\Hint.png"))) {
-            robot.mouseMove(windowImagePoint.first + StartPopupImageWidth.num + 10,  windowImagePoint.second+ StartPopupImageHeight.num + 10)
-            robot.mousePress(InputEvent.BUTTON1_DOWN_MASK)
+            robot.keyPress(KeyEvent.VK_ESCAPE)
             robot.delay(100)
-            robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK)
+            robot.keyRelease(KeyEvent.VK_ESCAPE)
             robot.delay(100)
             return true
         }

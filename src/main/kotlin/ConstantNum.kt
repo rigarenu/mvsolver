@@ -32,4 +32,28 @@ enum class ConstantNum(val num: Int) {
     PopupImageHeight(36),
     StartPopupImageWidth(499),
     StartPopupImageHeight(466),
+
+    // V5の座標
+    V5X(520),
+    V5Y(80),
+
+    // Q5の座標
+    Q5X(480),
+    Q5Y(160),
+
+    // M5の座標
+    M5X(560),
+    M5Y(160),
+
+    //+5の座標
+    Plus5X(480),
+    Plus5Y(480),
+
+    // #5の座標
+    Hash5X(560),
+    Hash5Y(480),
+
+    // #+5の座標
+    HashPlus5X(520),
+    HashPlus5Y(560)
 }
